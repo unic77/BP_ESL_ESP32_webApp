@@ -81,5 +81,4 @@
     {:else}
         <p>connect minumum 2 devices to play</p>    
     {/if}
-
 </div>
