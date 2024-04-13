@@ -1,0 +1,42 @@
+card{
+    position: relative;
+    margin: 10px;
+    padding: 10px;
+    border: 3px solid black;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    box-shadow: 0 5px 10px 5px rgba(0, 0, 0, 1);
+}
+
+card h5{
+    margin: 5px;
+}
+
+card h3{
+    margin: 5px;
+}
+
+card input{
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+card button{
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    width: 100%;
+}
+
+.inputNumber{
+    text-align: center;
+}
