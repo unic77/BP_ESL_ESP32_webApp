@@ -6,7 +6,7 @@ form{
     justify-content: center;
 }
 
-form h1{
+.header h1{
     position: relative;
     top: -20px;
     padding: 10px;

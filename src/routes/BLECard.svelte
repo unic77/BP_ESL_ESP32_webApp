@@ -1,10 +1,42 @@
 <script>
+    import { onMount } from 'svelte';
     import './blecard.css'
 
     /**
      * @type {any}
      */
-     export let player;
+    export let player;
+
+    /**
+     * @type {string}
+     */
+     export let deviceFunction;
+
+    
+    //todo: put al the functions into a java class
+    onMount(async () => {
+        player.device.gatt.connect().then((/** @type {any} */ server) => {
+        return server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
+        }).then((/** @type {any} */ service) => {
+            return service.getCharacteristic('a4fad047-26a6-44ed-b307-4ce99852b904');
+        }).then((/** @type {any} */ characteristic) => {
+            var characteristicFunction = characteristic;
+
+            characteristicFunction.startNotifications();
+            characteristicFunction.addEventListener('characteristicvaluechanged',(/** @type {any} */ event) =>{handleEvent(event, characteristicFunction)}); 
+        });
+    });
+
+    /**
+     * @param {any} event
+     * @param {{ value: any; }} characteristic
+     */
+    async function handleEvent(event, characteristic){
+        var decoder = new TextDecoder('utf-8');
+        var recievedText = decoder.decode(characteristic.value);
+        console.log(recievedText)
+        deviceFunction = recievedText;
+    }
 
     /**
      * @param {any} characteristic
@@ -37,30 +69,36 @@
         console.log('Update Device');
         console.log(player);
         sendValueToCharacteristic('1476db45-ed9c-4f50-ad6b-6e6815effa66', device, player.name);
-        sendValueToCharacteristic('170746ed-a31c-49ea-804a-178e244ee4ef', device, player.work);
-        sendValueToCharacteristic("e739d173-9337-4c78-97f4-d68512de07df",device, player.money.toString());
-        sendValueToCharacteristic("33cb479d-67ac-4073-9eac-58e886d64e0c", device, player.house);
-        if(player.childeren <= 6){
-            sendValueToCharacteristic("ca0929ca-0a50-4aa9-9aa0-898a93c6b15d", device, player.childeren.toString());
+    }
+
+    /**
+     * @param {{ gatt: { connect: () => Promise<any>; }; }} device
+     */
+    function ReadFunctions(device){
+        if (device.gatt) {
+            device.gatt.connect().then(server => {
+                console.log('Getting Service...');
+                return server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
+            }).then(service => {
+                console.log('Getting Characteristic...');
+                return service.getCharacteristic('a4fad047-26a6-44ed-b307-4ce99852b904');
+            }).then(characteristic => {
+                console.log('Reading value...');
+                return characteristic.readValue();
+            }).then(value => {
+                console.log('Value: ' + new TextDecoder().decode(value.buffer));
+            }).catch(error => {
+                console.log('Argh! ' + error);
+            });
         }
-        else{
-            console.warn('more childeren added than supported');
-        }
-        
     }
 </script>
 
 <card>
-    <h3>{name}</h3>
+    <h3>{player.device.name}</h3>
     <h5>player name: </h5>
     <input bind:value={player.name}>
-    <h5>player work: </h5>
-    <input bind:value={player.work}>
-    <h5>player money: </h5>
-    <input class="inputNumber" type="number" bind:value={player.money}>
-    <h5>player childeren: </h5>
-    <input class="inputNumber" type="number" bind:value={player.childeren}>
-    <h5>player house: </h5>
-    <input bind:value={player.house}>
+    <h5>device function: {deviceFunction}</h5>
     <button on:click={() => UpdateDevice(player.device)}>send</button>
+    <button on:click={() => ReadFunctions(player.device)}>read function</button> <!--for test> -->
 </card>
