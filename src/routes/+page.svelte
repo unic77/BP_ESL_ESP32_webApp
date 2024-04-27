@@ -51,10 +51,10 @@
                 
                 var player = {
                     device: device,
-                    name: 'none',
-                    work: 'none',
+                    name: null,
+                    work: null,
                     money: 0,
-                    house: 'none',
+                    house: null,
                     childeren: 1
                 }
                 arr.push(player);

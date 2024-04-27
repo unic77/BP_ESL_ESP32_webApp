@@ -40,3 +40,16 @@ card button{
 .inputNumber{
     text-align: center;
 }
+
+.choisesDiv{
+    display: flex !important;
+    justify-content: center;
+    flex-direction: row;
+    text-align: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.choisesDiv div{
+    display: flex;
+}

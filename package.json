@@ -20,6 +20,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@types/web-bluetooth": "^0.0.20"
+		"@types/web-bluetooth": "^0.0.20",
+		"firebase": "^10.11.1"
 	}
 }
