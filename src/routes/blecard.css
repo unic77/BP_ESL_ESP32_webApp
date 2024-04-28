@@ -42,6 +42,11 @@ card button{
 }
 
 .choisesDiv{
+    display: flex;
+    flex-direction: column;
+}
+
+.choisesDiv div{
     display: flex !important;
     justify-content: center;
     flex-direction: row;
@@ -50,6 +55,9 @@ card button{
     flex-wrap: wrap;
 }
 
-.choisesDiv div{
-    display: flex;
+.choisesDiv div div{
+    display: flex !important;
+    justify-content: center;
+    flex-direction: column;
+    flex-wrap: wrap;
 }

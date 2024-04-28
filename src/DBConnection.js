@@ -34,6 +34,7 @@ export const getHouses = async () => {
     data.id = doc.id;
     houses.push(data);
   });
+  console.log(houses)
   return houses;
 }
 
@@ -69,7 +70,9 @@ export const getCarriereUnief = async () => {
   return uniefcarrier;
 }
 
+//hie ris nog een fout met het resetten: fix. 
 export const setHouseBought = async (/** @type {any} */ house, /** @type {Boolean} */ bought) => {
+  console.log(house.id);
   const docRef = doc(db, "house", house.id);
   await updateDoc(docRef,{
     alGekocht: bought

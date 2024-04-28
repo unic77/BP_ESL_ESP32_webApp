@@ -53,8 +53,8 @@
                     device: device,
                     name: null,
                     work: null,
-                    money: 0,
-                    house: null,
+                    money: 400000,
+                    house: [],
                     childeren: 1
                 }
                 arr.push(player);

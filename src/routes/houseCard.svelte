@@ -1,5 +1,6 @@
 <script>
     export let house;
+    export let deleteHouse;
 </script>
 
 <style>
@@ -16,6 +17,12 @@
         scale: 1.1;
     }
 
+    .delete:hover{
+        background-color: rgb(227, 90, 90);
+        color: white;
+    }
+
+
     .high{
         color: green;
     }
@@ -26,7 +33,7 @@
 
 </style>
 
-<house>
+<house class={!deleteHouse ? "": "delete"}>
     <h4>{house.naam}</h4>
     <p>koop prijs: {house.koopPrijs} $</p>
     <p>verkoop prijzen:</p>
