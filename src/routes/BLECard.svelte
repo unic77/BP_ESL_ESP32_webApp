@@ -5,12 +5,15 @@
     import Carrier from './carrierCard.svelte';
     import House from './houseCard.svelte';
 
-    //todo: implementeer meerder huizen kopen of verkopen. implementeer het verkoop gedeelte
+    //todo: implementeer kinderen
 
     /**
      * @type {any}
      */
     export let player;
+
+    export let currentPlayer;
+    $: console.log(currentPlayer)
 
     /**
      * @type {string}
@@ -38,27 +41,31 @@
     var characteristicFunction;
 
     export let rolled;
-    $: () => {
-        player.boardPosition = player.boardPosition + rolled;
-        console.log("bord position "+ player.name +": " + player.boardPosition);
-        sendValueToCharacteristic("b2cb2216-b3a6-40f9-b4a3-8149e1a1fbce", player.device, player.boardPosition);
+    $:{
+        if(currentPlayer == player.device.id){
+            console.log('rolled: ' + rolled);
+            console.log(player);
+            player.boardPosition = player.boardPosition + rolled;
+            console.log("bord position "+ player.name +": " + player.boardPosition);
+            sendValueToCharacteristic("b2cb2216-b3a6-40f9-b4a3-8149e1a1fbce", player.device, player.boardPosition);
+        }
     }
 
-    // onDestroy(() => {
-    //     //does not work on reload => how to fix ?
-    //     if(player.device.gatt.connected){
-    //         characteristicFunction.stopNotifications();
-    //         player.device.gatt.disconnect();
-    //     }
+    onDestroy(() => {
+        //does not work on reload => how to fix ?
+        if(player.device.gatt.connected){
+            characteristicFunction.stopNotifications();
+            player.device.gatt.disconnect();
+        }
 
-    //     //reset game on db
-    //     if(player.work){
-    //         setCarriereChosen(player.work, !player.work.universitie, false);
-    //     }
-    //     if(player.house){
-    //         setHouseBought(player.house, false);
-    //     }
-    // });
+        //reset game on db
+        if(player.work){
+            setCarriereChosen(player.work, !player.work.universitie, false);
+        }
+        if(player.house){
+            setHouseBought(player.house, false);
+        }
+    });
 
     
     //todo: put al the functions into a java class

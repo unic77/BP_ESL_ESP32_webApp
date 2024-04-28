@@ -7,11 +7,12 @@
      * @type {any[]}
      */
     let arr = [];
+    $: currentPlayer = arr[0];
 
     /**
      * @type {any}
      */
-    let rolled;
+    let rolled = 0;
 
     /**
      * @type {any}
@@ -21,7 +22,7 @@
     /**
      * @type {number}
      */
-    var currentPlayerIndex;
+    var currentPlayerIndex = 0;
 
     function isWebBLEAvaible(){
         if(!navigator.bluetooth){
@@ -32,18 +33,19 @@
     }
 
     function nextPlayer(){
+        rolled = 0;
         if(!currentPlayer){
             currentPlayer = arr[0];
             currentPlayerIndex = 0;
         }
         else{
             currentPlayerIndex++;
+            console.log(currentPlayerIndex);
             if(currentPlayerIndex >= arr.length){
                 currentPlayerIndex = 0;
             }
             currentPlayer = arr[currentPlayerIndex];
         }
-        rolled = 0;
     }
 
     function connectRequest(){
@@ -78,6 +80,7 @@
                     boardPosition: 0,
                     childeren: 1
                 }
+                console.log(player);
                 arr.push(player);
                 arr = arr;
             }
@@ -101,18 +104,14 @@
 <div class="totalBle">
     {#if arr}
         <div class="connectedBle">
-                //array mag niet updaten. 
-                {#each arr as player}
-                    {#if player == currentPlayer}
-                        <Card rolled={rolled} player={player}/> 
-                    {:else}
-                        <Card rolled={0} player={player}/> 
-                    {/if}
-                {/each}
+                <!-- array mag niet updaten.  -->
+            {#each arr as player}
+                <Card rolled={rolled} currentPlayer={currentPlayer.device.id} player={player}/> 
+            {/each}
         </div>
 
         {#if arr.length >= 2}
-            {#if rolled}
+            {#if rolled && currentPlayer}
                 <h3>player: {currentPlayer.name} rolled: {rolled}</h3>
             {/if}
             {#if currentPlayer}
