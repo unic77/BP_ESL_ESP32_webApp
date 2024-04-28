@@ -8,7 +8,20 @@
      */
     let arr = [];
 
+    /**
+     * @type {any}
+     */
+    let rolled;
 
+    /**
+     * @type {any}
+     */
+    var currentPlayer;
+
+    /**
+     * @type {number}
+     */
+    var currentPlayerIndex;
 
     function isWebBLEAvaible(){
         if(!navigator.bluetooth){
@@ -18,18 +31,26 @@
         return true;
     }
 
+    function nextPlayer(){
+        if(!currentPlayer){
+            currentPlayer = arr[0];
+            currentPlayerIndex = 0;
+        }
+        else{
+            currentPlayerIndex++;
+            if(currentPlayerIndex >= arr.length){
+                currentPlayerIndex = 0;
+            }
+            currentPlayer = arr[currentPlayerIndex];
+        }
+        rolled = 0;
+    }
+
     function connectRequest(){
         if(!isWebBLEAvaible()){
             return;
         }
         getDeviceInfo();
-    }
-
-    /**
-     * @param {any[]} arr
-     */
-    function storeDeviceInfLocal(arr){
-        localStorage.setItem('devices', JSON.stringify(arr));
     }
 
     function getDeviceInfo(){
@@ -80,15 +101,27 @@
 <div class="totalBle">
     {#if arr}
         <div class="connectedBle">
+                //array mag niet updaten. 
                 {#each arr as player}
-                    <Card player={player}/> 
+                    {#if player == currentPlayer}
+                        <Card rolled={rolled} player={player}/> 
+                    {:else}
+                        <Card rolled={0} player={player}/> 
+                    {/if}
                 {/each}
         </div>
 
         {#if arr.length >= 2}
-            <a href="/gamepage" on:click={() => storeDeviceInfLocal(arr)}>start game</a>
-            <!-- <button class="startButton" on:click={() => printConnectedBleDevices()}>start</button> -->
-        {:else}
+            {#if rolled}
+                <h3>player: {currentPlayer.name} rolled: {rolled}</h3>
+            {/if}
+            {#if currentPlayer}
+                <button on:click={() =>{rolled = Math.floor(Math.random() * 10)}}>spin for player {currentPlayer.name}</button>
+                <button on:click={() => nextPlayer()}>next player</button>
+            {:else}
+                <button on:click={() => nextPlayer()}>start game</button>
+            {/if}
+        {:else} 
             <p>connect minumum 2 devices to play</p>    
         {/if}
     {/if}

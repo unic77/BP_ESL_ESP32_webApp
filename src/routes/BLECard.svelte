@@ -25,32 +25,45 @@
     /**
      * @type {boolean}
      */
-    let nameInit = false;
+    let nameInit;
+    
+    /**
+     * @type {null}
+     */
+    let currentName;
 
     /**
      * @type {any}
      */
     var characteristicFunction;
 
-    onDestroy(() => {
-        //does not work on reload => how to fix ?
-        if(player.device.gatt.connected){
-            characteristicFunction.stopNotifications();
-            player.device.gatt.disconnect();
-        }
+    export let rolled;
+    $: () => {
+        player.boardPosition = player.boardPosition + rolled;
+        console.log("bord position "+ player.name +": " + player.boardPosition);
+        sendValueToCharacteristic("b2cb2216-b3a6-40f9-b4a3-8149e1a1fbce", player.device, player.boardPosition);
+    }
 
-        //reset game on db
-        if(player.work){
-            setCarriereChosen(player.work, !player.work.universitie, false);
-        }
-        if(player.house){
-            setHouseBought(player.house, false);
-        }
-    });
+    // onDestroy(() => {
+    //     //does not work on reload => how to fix ?
+    //     if(player.device.gatt.connected){
+    //         characteristicFunction.stopNotifications();
+    //         player.device.gatt.disconnect();
+    //     }
+
+    //     //reset game on db
+    //     if(player.work){
+    //         setCarriereChosen(player.work, !player.work.universitie, false);
+    //     }
+    //     if(player.house){
+    //         setHouseBought(player.house, false);
+    //     }
+    // });
 
     
     //todo: put al the functions into a java class
     onMount(async () => {
+        //doesnt have to reconnect evry time. => search how to fix
         player.device.gatt.connect().then((/** @type {any} */ server) => {
         return server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
         }).then((/** @type {any} */ service) => {
@@ -63,6 +76,15 @@
             characteristicFunction.addEventListener('characteristicvaluechanged',(/** @type {any} */ event) =>{handleBleEvent(event, characteristicFunction)}); 
             console.log('Event listener added');
         });
+
+        if(player.name){
+            currentName = player.name;
+            nameInit = true;
+        }
+        else{
+            currentName = null;
+            nameInit = false;
+        }
     });
 
     /**
@@ -176,6 +198,7 @@
         sendValueToCharacteristic('ca0929ca-0a50-4aa9-9aa0-898a93c6b15d', device, player.childeren);
         sendValueToCharacteristic('e739d173-9337-4c78-97f4-d68512de07df', player.device, player.money);
         nameInit = true;
+        player.name = currentName;
     }
 
     /**
@@ -225,7 +248,7 @@
     {#if nameInit}
         <p>{player.name}</p>
     {:else}
-        <input bind:value={player.name}>
+        <input bind:value={currentName}>
     {/if}
     {#if choises}
         <div class="choisesDiv">
