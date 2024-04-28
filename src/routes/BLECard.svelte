@@ -57,9 +57,11 @@
             return service.getCharacteristic('a4fad047-26a6-44ed-b307-4ce99852b904');
         }).then((/** @type {any} */ characteristic) => {
             characteristicFunction = characteristic;
-
+            console.log('Getting Characteristic...');
             characteristicFunction.startNotifications();
+            console.log('Notifications started');
             characteristicFunction.addEventListener('characteristicvaluechanged',(/** @type {any} */ event) =>{handleBleEvent(event, characteristicFunction)}); 
+            console.log('Event listener added');
         });
     });
 

@@ -44,10 +44,9 @@
         console.log('Requesting Bluetooth Device...');
         navigator.bluetooth.requestDevice(options).then(async device => {
             console.log('Connecting to GATT Server...');
-            if(!arr.includes(device)){
-                //fix zodat niet meer dan 1 device vna het zelfde ene nieuw profiel aan maakt. dit werkt nietmeer door player
-                console.log('Name: ' + device.name);
 
+            if(!arr.find(player => player.device.id === device.id)){
+                console.log('Name: ' + device.name);
                 
                 var player = {
                     device: device,
@@ -55,6 +54,7 @@
                     work: null,
                     money: 400000,
                     house: [],
+                    boardPosition: 0,
                     childeren: 1
                 }
                 arr.push(player);
