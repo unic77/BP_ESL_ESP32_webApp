@@ -9,6 +9,8 @@
     let arr = [];
     $: currentPlayer = arr[0];
 
+    let updatePosition = false;
+
     /**
      * @type {any}
      */
@@ -40,7 +42,6 @@
         }
         else{
             currentPlayerIndex++;
-            console.log(currentPlayerIndex);
             if(currentPlayerIndex >= arr.length){
                 currentPlayerIndex = 0;
             }
@@ -78,7 +79,9 @@
                     money: 400000,
                     house: [],
                     boardPosition: 0,
-                    childeren: 1
+                    childeren: 1,
+                    amountOfWildCards: 0,
+                    endValue: null,
                 }
                 console.log(player);
                 arr.push(player);
@@ -92,7 +95,12 @@
             console.log('Argh! ' + error);
         });
 
-    }  
+    }
+    
+    function rollrandom(){
+        updatePosition = true;
+        rolled = Math.floor(Math.random() * 4)+1;
+    }
 
 </script>
 <reference types="web-bluetooth" />
@@ -104,9 +112,8 @@
 <div class="totalBle">
     {#if arr}
         <div class="connectedBle">
-                <!-- array mag niet updaten.  -->
             {#each arr as player}
-                <Card rolled={rolled} currentPlayer={currentPlayer.device.id} player={player}/> 
+                <Card rolled={rolled} bind:updatePosition={updatePosition} currentPlayer={currentPlayer.device.id} player={player}/> 
             {/each}
         </div>
 
@@ -114,10 +121,11 @@
             {#if rolled && currentPlayer}
                 <h3>player: {currentPlayer.name} rolled: {rolled}</h3>
             {/if}
-            {#if currentPlayer}
-                <button on:click={() =>{rolled = Math.floor(Math.random() * 10)}}>spin for player {currentPlayer.name}</button>
+            {#if currentPlayer.name}
+                <button on:click={() =>{rollrandom()}}>spin for player {currentPlayer.name}</button>
                 <button on:click={() => nextPlayer()}>next player</button>
             {:else}
+                <h3>click on the button below when all names have been filled in</h3>
                 <button on:click={() => nextPlayer()}>start game</button>
             {/if}
         {:else} 

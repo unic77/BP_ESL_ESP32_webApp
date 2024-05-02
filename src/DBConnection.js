@@ -34,7 +34,6 @@ export const getHouses = async () => {
     data.id = doc.id;
     houses.push(data);
   });
-  console.log(houses)
   return houses;
 }
 
@@ -72,7 +71,6 @@ export const getCarriereUnief = async () => {
 
 //hie ris nog een fout met het resetten: fix. 
 export const setHouseBought = async (/** @type {any} */ house, /** @type {Boolean} */ bought) => {
-  console.log(house.id);
   const docRef = doc(db, "house", house.id);
   await updateDoc(docRef,{
     alGekocht: bought
@@ -90,4 +88,20 @@ export const setCarriereChosen = async (/** @type {any} */ carriere, /** @type {
   await updateDoc(docRef,{
     alGekozen: chosen
   });
+}
+
+export const getWildCard = async () => {
+  const docRef = collection(db, "wildcard");
+  const docSnap = await getDocs(docRef);
+  /**
+   * @type {any[]}
+   */
+  let wildcard = [];
+  docSnap.forEach((doc) => {
+    var data = doc.data();
+    data.id = doc.id;
+    wildcard.push(data);
+  });
+  var randomNumber = Math.floor(Math.random() * wildcard.length);
+  return wildcard[randomNumber];
 }

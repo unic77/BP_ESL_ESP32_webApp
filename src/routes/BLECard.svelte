@@ -1,7 +1,7 @@
 <script>
     import { onDestroy, onMount } from 'svelte';
     import './blecard.css'
-    import {getCarriere, getCarriereUnief, getHouses,setHouseBought, setCarriereChosen} from '../DBConnection.js';
+    import {getCarriere, getCarriereUnief, getHouses,setHouseBought, setCarriereChosen, getWildCard} from '../DBConnection.js';
     import Carrier from './carrierCard.svelte';
     import House from './houseCard.svelte';
 
@@ -13,7 +13,6 @@
     export let player;
 
     export let currentPlayer;
-    $: console.log(currentPlayer)
 
     /**
      * @type {string}
@@ -40,14 +39,17 @@
      */
     var characteristicFunction;
 
+    /**
+     * @type {boolean}
+     */
+    export let updatePosition;
+
     export let rolled;
     $:{
-        if(currentPlayer == player.device.id){
-            console.log('rolled: ' + rolled);
-            console.log(player);
+        if(currentPlayer == player.device.id && updatePosition == true){
             player.boardPosition = player.boardPosition + rolled;
-            console.log("bord position "+ player.name +": " + player.boardPosition);
             sendValueToCharacteristic("b2cb2216-b3a6-40f9-b4a3-8149e1a1fbce", player.device, player.boardPosition);
+            updatePosition = false;
         }
     }
 
@@ -70,7 +72,6 @@
     
     //todo: put al the functions into a java class
     onMount(async () => {
-        //doesnt have to reconnect evry time. => search how to fix
         player.device.gatt.connect().then((/** @type {any} */ server) => {
         return server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
         }).then((/** @type {any} */ service) => {
@@ -99,12 +100,9 @@
      * @param {{ value: any; }} characteristic
      */
     async function handleBleEvent(event, characteristic){
-        //nog groote functionaliteit insteken. 
         var decoder = new TextDecoder('utf-8');
         var recievedText = decoder.decode(characteristic.value);
         deviceFunction = recievedText;
-
-        console.log('recieved: ' + recievedText);
         
         if(recievedText == 'carrier'){
             choises = await getCarriere();
@@ -117,6 +115,22 @@
         }
         else if(recievedText == 'salaris'){
             UpdateDeviceAndBackend(player.device);
+        }
+        else if(recievedText == 'kinderen'){
+            choises = ['yes', 'no'];
+        }
+        else if(recievedText == 'stop'){
+            alert('player landed on a stop card cancel this mesage and roll again');
+            player.boardPosition = 0;
+            sendValueToCharacteristic("b2cb2216-b3a6-40f9-b4a3-8149e1a1fbce", player.device, player.boardPosition);
+        }
+        else if(recievedText == 'end'){
+            //implement
+            alert('end');
+        }
+        else if(recievedText == 'wildcard'){
+            var wildCard = await getWildCard();
+            handelWildCard(wildCard);
         }
         else{
             alert('internal error, function not found');
@@ -131,13 +145,10 @@
     function sendValueToCharacteristic(characteristic, device, value){
         if (device.gatt) {
                 device.gatt.connect().then(server => {
-                console.log('Getting Service...');
                 return server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
             }).then(service => {
-                console.log('Getting Characteristic...');
                 return service.getCharacteristic(characteristic);
             }).then(characteristic => {
-                console.log('Writing value...');
                 return characteristic.writeValue(new TextEncoder().encode(value));
             }).then(() => {
                 console.log('Value written!');
@@ -148,25 +159,45 @@
     }
 
     /**
+     * @param {any} wildCard
+     */
+    function handelWildCard(wildCard){
+        alert(player.name + ": " + wildCard.text);
+        if(wildCard.from == "money"){
+            player.money = player.money + wildCard.value;
+            sendValueToCharacteristic('e739d173-9337-4c78-97f4-d68512de07df', player.device, player.money);
+            player.amountOfWildCards = player.amountOfWildCards + 1;
+            
+        }
+        else if(wildCard.from == "salaris"){
+            player.salaris = player.salaris + wildCard.value;
+            player.amountOfWildCards = player.amountOfWildCards + 1;
+        }
+        else{
+            alert('internal errorn');
+        }
+    }
+
+    /**
      * @param {BluetoothDevice} device
      * @param {any} [value]
-     * naam klopt niet is meer dan alleen update backend enzo
+     * 
      */
     function UpdateDeviceAndBackend(device, value){
-        console.log('Update Device');
-        console.log(player);
         if(deviceFunction == 'carrier' || deviceFunction == 'universiteit'){
             player.work = value;
             player.salaris = value.salaris;
 
             if(deviceFunction == 'universiteit'){
                 setCarriereChosen(value, false, true);
+                player.money = player.money - 200000;
             }
             else{
                 setCarriereChosen(value, true, true);
             }
 
             sendValueToCharacteristic('170746ed-a31c-49ea-804a-178e244ee4ef', device, player.work.naam);
+            sendValueToCharacteristic('e739d173-9337-4c78-97f4-d68512de07df', device, player.money);
             choises = [];
         }
         else if(deviceFunction == 'salaris' && player.work){
@@ -199,21 +230,18 @@
     /**
      * @param {BluetoothDevice} device
      */
-    function updateName(device){
+    function playerInit(device){
+        player.name = currentName;
         sendValueToCharacteristic('1476db45-ed9c-4f50-ad6b-6e6815effa66', device, player.name);
-        //set one character in the car
         sendValueToCharacteristic('ca0929ca-0a50-4aa9-9aa0-898a93c6b15d', device, player.childeren);
         sendValueToCharacteristic('e739d173-9337-4c78-97f4-d68512de07df', player.device, player.money);
         nameInit = true;
-        player.name = currentName;
     }
 
     /**
      * @param {any} house
      */
     function sellHous(house){
-        console.log(player.house);
-        
         if(confirm('Odd number will sell the house low, even number will sell the house high. Do you accept?')){
             setHouseBought(house, false);
             player.house = player.house.filter((/** @type {any} */ h) => h != house);
@@ -247,6 +275,19 @@
             sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, housarray.length + "");
         }
     }
+
+    /**
+     * @param {string} choise
+     */
+    function addchilderen(choise){
+        if(choise == 'yes'){
+            player.childeren = player.childeren + 1;
+        }
+        sendValueToCharacteristic('ca0929ca-0a50-4aa9-9aa0-898a93c6b15d', player.device, player.childeren);
+        choises = [];
+        deviceFunction = '';
+    }
+
 </script>
 
 <card>
@@ -259,15 +300,20 @@
     {/if}
     {#if choises}
         <div class="choisesDiv">
+            {#if deviceFunction == 'kinderen'}
+                <h4>do you want an extra child?</h4>
+            {/if}
             <div>
                 {#each choises as choise}
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <!-- svelte-ignore a11y-no-static-element-interactions -->
                     <div on:click={() => {UpdateDeviceAndBackend(player.device, choise)}}>
-                        {#if deviceFunction == 'carrier'}
+                        {#if deviceFunction == 'carrier' || deviceFunction == 'universiteit'}
                             <Carrier carrier={choise}/>
                         {:else if deviceFunction == 'house'}
                             <House deleteHouse={false} house={choise}/>
+                        {:else if deviceFunction == 'kinderen'}
+                            <button on:click={() => addchilderen(choise)}>{choise}</button>
                         {/if}
                     </div>
                 {/each}
@@ -287,6 +333,6 @@
         </div>
     {/if}
     {#if !nameInit}
-        <button on:click={() => updateName(player.device)}>send</button>
+        <button on:click={() => playerInit(player.device)}>send</button>
     {/if}
 </card>
