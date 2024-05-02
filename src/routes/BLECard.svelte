@@ -15,6 +15,11 @@
     export let currentPlayer;
 
     /**
+     * @type {(arg0: any) => void}
+     */
+     export let endPlayer;
+
+    /**
      * @type {string}
      */
     let deviceFunction;
@@ -242,9 +247,9 @@
      * @param {any} house
      */
     function sellHous(house){
+        alert('house: ' + house.naam + ' will be sold');
         if(confirm('Odd number will sell the house low, even number will sell the house high. Do you accept?')){
             setHouseBought(house, false);
-            player.house = player.house.filter((/** @type {any} */ h) => h != house);
             var randomVlaue = Math.floor(Math.random() * 10);
             if(randomVlaue % 2 == 0){
                 alert('house sold number: '+ randomVlaue + ' even');
@@ -254,6 +259,7 @@
                 alert('house sold number: '+ randomVlaue + ' oneven');
                 player.money = player.money + house.verkoopPrijsLaag;
             }
+            player.house = player.house.filter((/** @type {any} */ h) => h != house);
             sendValueToCharacteristic('e739d173-9337-4c78-97f4-d68512de07df', player.device, player.money);
             updateHouse(player.house);
         }
@@ -286,6 +292,21 @@
         sendValueToCharacteristic('ca0929ca-0a50-4aa9-9aa0-898a93c6b15d', player.device, player.childeren);
         choises = [];
         deviceFunction = '';
+    }
+
+    function endGameForPlayer(){
+        alert("game for " + player.name + " ended. now calculating end value.");
+        player.money = player.amountOfWildCards * 100000;
+        player.amountOfWildCards = 0;
+
+        player.money = player.childeren * 100000;
+        player.childeren = 0;
+
+        player.house.forEach((/** @type {any} */ house) => {
+            sellHous(house);
+        });
+
+        endPlayer(player);
     }
 
 </script>

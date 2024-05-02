@@ -12,6 +12,11 @@
     let updatePosition = false;
 
     /**
+     * @type {number}
+     */
+    let amountOfPlayersEnded = 0;
+
+    /**
      * @type {any}
      */
     let rolled = 0;
@@ -102,6 +107,45 @@
         rolled = Math.floor(Math.random() * 4)+1;
     }
 
+    /**
+     * @param {any} player
+     */
+    function endPlayer(player){
+        amountOfPlayersEnded++;
+        console.log('player ended: ' + player.name);
+        switch(amountOfPlayersEnded){
+            case 1:
+                player.money = player.money + 800000;
+            break;
+
+            case 2:
+                player.money = player.money + 600000;
+            break;
+
+            case 3:
+                player.money = player.money + 400000;
+            break;
+
+            case 4:
+                player.money = player.money + 200000;
+                calculateWinner();
+            break;
+        }
+    
+    }
+
+    function calculateWinner(){
+        let winner = arr[0];
+        arr.forEach(player => {
+            if(player.money > winner.money){
+                winner = player;
+            }
+        });
+
+        console.log('winner is: ' + winner.name);
+        alert('winner is: ' + winner.name);
+    }
+
 </script>
 <reference types="web-bluetooth" />
 
@@ -113,7 +157,7 @@
     {#if arr}
         <div class="connectedBle">
             {#each arr as player}
-                <Card rolled={rolled} bind:updatePosition={updatePosition} currentPlayer={currentPlayer.device.id} player={player}/> 
+                <Card endPlayer={endPlayer} rolled={rolled} bind:updatePosition={updatePosition} currentPlayer={currentPlayer.device.id} player={player}/> 
             {/each}
         </div>
 
