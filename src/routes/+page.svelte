@@ -1,6 +1,8 @@
 <script>
     import Card from './BLECard.svelte';
     import './main.css'
+    import {setHouseBought, setCarriereChosen} from '../DBConnection.js';
+
     let deviceName = "ESP32";
 
     /**
@@ -86,7 +88,6 @@
                     boardPosition: 0,
                     childeren: 1,
                     amountOfWildCards: 0,
-                    endValue: null,
                 }
                 console.log(player);
                 arr.push(player);
@@ -146,6 +147,37 @@
         alert('winner is: ' + winner.name);
     }
 
+    /**
+     * @param {any} event
+     */
+    function beforeUnload(event){
+
+        event.preventDefault();
+        event.returnValue = '';
+
+        alert('beforeunload');
+        console.log('beforeunload');
+
+        //update db
+        arr.forEach(player => {
+            player.device.gatt.disconnect();
+            if(player.device.gatt.connected){
+                player.device.gatt.disconnect();
+            }
+
+            //reset game on db
+            if(player.work){
+                setCarriereChosen(player.work, !player.work.universitie, false);
+            }
+            if(player.house){
+                player.house.forEach((/** @type {any} */ house) => {
+                    setHouseBought(house, false);
+                });
+            }
+        });
+        return '...';
+    }
+
 </script>
 <reference types="web-bluetooth" />
 
@@ -153,6 +185,9 @@
 <form>
     <button on:click={() => connectRequest()} > connect with BLE device</button>
 </form>
+
+<svelte:window on:beforeunload={(event) => beforeUnload(event)}/>
+
 <div class="totalBle">
     {#if arr}
         <div class="connectedBle">

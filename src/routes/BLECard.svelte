@@ -196,9 +196,11 @@
             if(deviceFunction == 'universiteit'){
                 setCarriereChosen(value, false, true);
                 player.money = player.money - 200000;
+                player.work.universitie = true;
             }
             else{
                 setCarriereChosen(value, true, true);
+                player.work.universitie = false;
             }
 
             sendValueToCharacteristic('170746ed-a31c-49ea-804a-178e244ee4ef', device, player.work.naam);
