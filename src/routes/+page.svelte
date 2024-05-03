@@ -169,6 +169,7 @@
             if(player.work){
                 setCarriereChosen(player.work, !player.work.universitie, false);
             }
+            
             if(player.house){
                 player.house.forEach((/** @type {any} */ house) => {
                     setHouseBought(house, false);

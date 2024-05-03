@@ -108,6 +108,7 @@
         var decoder = new TextDecoder('utf-8');
         var recievedText = decoder.decode(characteristic.value);
         deviceFunction = recievedText;
+        console.log(recievedText);
         
         if(recievedText == 'carrier'){
             choises = await getCarriere();
@@ -136,6 +137,9 @@
         else if(recievedText == 'wildcard'){
             var wildCard = await getWildCard();
             handelWildCard(wildCard);
+        }
+        else if(recievedText == ''){
+            //no Operation
         }
         else{
             alert('internal error, function not found');
