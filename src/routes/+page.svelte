@@ -117,18 +117,28 @@
         switch(amountOfPlayersEnded){
             case 1:
                 player.money = player.money + 800000;
+                alert('player: ' + player.name + ' engdigt eerst en krijgt 800000$');
             break;
 
             case 2:
                 player.money = player.money + 600000;
+                alert('player: ' + player.name + ' engdigt tweede en krijgt 600000$');
+                if(amountOfPlayersEnded >= arr.length){
+                    calculateWinner();
+                }
             break;
 
             case 3:
                 player.money = player.money + 400000;
+                alert('player: ' + player.name + ' engdigt derde en krijgt 400000$');
+                if(amountOfPlayersEnded >= arr.length){
+                    calculateWinner();
+                }
             break;
 
             case 4:
                 player.money = player.money + 200000;
+                alert('player: ' + player.name + ' engdigt vierde en krijgt 200000$');
                 calculateWinner();
             break;
         }
@@ -136,6 +146,9 @@
     }
 
     function calculateWinner(){
+        console.log("players: ");
+        console.log(arr);
+        console.log("amount of ended players: "+ amountOfPlayersEnded);
         let winner = arr[0];
         arr.forEach(player => {
             if(player.money > winner.money){
@@ -145,6 +158,7 @@
 
         console.log('winner is: ' + winner.name);
         alert('winner is: ' + winner.name);
+        alert("restart the browser to play again");
     }
 
     /**
@@ -155,11 +169,9 @@
         event.preventDefault();
         event.returnValue = '';
 
-        alert('beforeunload');
-        console.log('beforeunload');
-
         //update db
         arr.forEach(player => {
+            console.log('disconnecting: ' + player.name);
             player.device.gatt.disconnect();
             if(player.device.gatt.connected){
                 player.device.gatt.disconnect();
@@ -176,6 +188,10 @@
                 });
             }
         });
+
+        alert('beforeunload');
+        console.log('beforeunload');
+
         return '...';
     }
 

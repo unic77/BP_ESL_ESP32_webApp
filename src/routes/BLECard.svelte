@@ -131,7 +131,7 @@
             sendValueToCharacteristic("b2cb2216-b3a6-40f9-b4a3-8149e1a1fbce", player.device, player.boardPosition);
         }
         else if(recievedText == 'end'){
-            //implement
+            endGameForPlayer();
             alert('end');
         }
         else if(recievedText == 'wildcard'){
@@ -172,8 +172,15 @@
      */
     function handelWildCard(wildCard){
         alert(player.name + ": " + wildCard.text);
+        console.log("before: ");
+        console.log(player);
+        console.log("value: ");
+        console.log(wildCard);
+        console.log(wildCard.value);
         if(wildCard.from == "money"){
             player.money = player.money + wildCard.value;
+            console.log("after: ");
+            console.log(player);
             sendValueToCharacteristic('e739d173-9337-4c78-97f4-d68512de07df', player.device, player.money);
             player.amountOfWildCards = player.amountOfWildCards + 1;
             
@@ -181,6 +188,8 @@
         else if(wildCard.from == "salaris"){
             player.salaris = player.salaris + wildCard.value;
             player.amountOfWildCards = player.amountOfWildCards + 1;
+            console.log("after: ");
+            console.log(player);
         }
         else{
             alert('internal errorn');
@@ -280,7 +289,10 @@
      * @param {any[]} housarray
      */
     function updateHouse(housarray){
-        if(housarray.length <= 1){
+        if(housarray.length = 0){
+            sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, "");
+        }
+        else if(housarray.length = 1){
             sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, housarray[0].naam);
         }
         else{
