@@ -179,6 +179,7 @@
 
             //reset game on db
             if(player.work){
+                console.log('resetting work');
                 setCarriereChosen(player.work, !player.work.universitie, false);
             }
             

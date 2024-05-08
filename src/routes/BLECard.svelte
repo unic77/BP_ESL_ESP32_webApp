@@ -289,10 +289,11 @@
      * @param {any[]} housarray
      */
     function updateHouse(housarray){
-        if(housarray.length = 0){
+        console.log(housarray);
+        if(housarray.length == 0){
             sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, "");
         }
-        else if(housarray.length = 1){
+        else if(housarray.length == 1){
             sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, housarray[0].naam);
         }
         else{
