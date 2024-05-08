@@ -263,15 +263,15 @@
      */
     function sellHous(house){
         alert('house: ' + house.naam + ' will be sold');
-        if(confirm('Odd number will sell the house low, even number will sell the house high. Do you accept?')){
+        if(confirm('the prise at which the hous will be sold is dependend on a number being odd or even, Do you accept?')){
             setHouseBought(house, false);
             var randomVlaue = Math.floor(Math.random() * 10);
             if(randomVlaue % 2 == 0){
-                alert('house sold number: '+ randomVlaue + ' even');
+                alert('house sold number: '+ randomVlaue + ' even and is sold for: ' + house.verkoopPrijsHoog + ' $');
                 player.money = player.money + house.verkoopPrijsHoog;
             }
             else{
-                alert('house sold number: '+ randomVlaue + ' oneven');
+                alert('house sold number: '+ randomVlaue + ' oneven and is sold for: '+ house.verkoopPrijsLaag + ' $');
                 player.money = player.money + house.verkoopPrijsLaag;
             }
             player.house = player.house.filter((/** @type {any} */ h) => h != house);
