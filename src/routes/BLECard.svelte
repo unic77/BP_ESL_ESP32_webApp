@@ -58,6 +58,8 @@
         }
     }
 
+    let playerEnded = false;
+
     onDestroy(() => {
         //does not work on reload => how to fix ?
         if(player.device.gatt.connected){
@@ -132,7 +134,6 @@
         }
         else if(recievedText == 'end'){
             endGameForPlayer();
-            alert('end');
         }
         else if(recievedText == 'wildcard'){
             var wildCard = await getWildCard();
@@ -289,15 +290,19 @@
      * @param {any[]} housarray
      */
     function updateHouse(housarray){
-        console.log(housarray);
-        if(housarray.length == 0){
-            sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, "");
+        try{
+            if(housarray.length == 0){
+                sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, "");
+            }
+            else if(housarray.length == 1){
+                sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, housarray[0].naam);
+            }
+            else{
+                sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, housarray.length + "");
+            }
         }
-        else if(housarray.length == 1){
-            sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, housarray[0].naam);
-        }
-        else{
-            sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, housarray.length + "");
+        catch(e){
+           updateHouse(housarray); 
         }
     }
 
@@ -324,6 +329,9 @@
         player.house.forEach((/** @type {any} */ house) => {
             sellHous(house);
         });
+
+        alert("player: " + player.name + " has ended with " + player.money + "$")
+        playerEnded = true;
 
         endPlayer(player);
     }
@@ -369,6 +377,9 @@
                     </div>
                 {/each}
                 </div>
+            {/if}
+            {#if playerEnded}
+                <h4>player {player.name} ended with {player.money}$</h4>
             {/if}
         </div>
     {/if}
