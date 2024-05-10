@@ -283,7 +283,7 @@
             alert('house not sold');
         }
         choises = [];
-        deviceFunction = '';
+        deviceFunction = ''; 
     }
 
     /**
@@ -291,8 +291,10 @@
      */
     function updateHouse(housarray){
         try{
+            console.log("hier1")
             if(housarray.length == 0){
-                sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, "");
+                console.log("hier2")
+                sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, " ");
             }
             else if(housarray.length == 1){
                 sendValueToCharacteristic('33cb479d-67ac-4073-9eac-58e886d64e0c', player.device, housarray[0].naam);
